@@ -126,13 +126,6 @@ func Run(ctx context.Context, config string) error {
 		if err != nil {
 			return fmt.Errorf("encounted error while creating request: %v", err.Error())
 		}
-		if strings.Contains(conf.Headers, ";") {
-			for _, element := range strings.Split(conf.Headers, ";") {
-				req.Header.Add(strings.Split(element, ":")[0], strings.Split(element, ":")[1])
-			}
-		} else {
-			req.Header.Add(strings.Split(conf.Headers, ":")[0], strings.Split(conf.Headers, ":")[1])
-		}
 
 	} else {
 		req, err = http.NewRequestWithContext(ctx, requestType, conf.URL, bytes.NewBufferString(conf.Body))
@@ -140,6 +133,14 @@ func Run(ctx context.Context, config string) error {
 			return fmt.Errorf("encounted error while creating request: %v", err.Error())
 		}
 		req.Header.Add("Content-Type", conf.ContentType)
+	}
+
+	if conf.Headers != "" {
+		for _, element := range strings.Split(conf.Headers, ";") {
+			req.Header.Add(strings.Split(element, ":")[0], strings.Split(element, ":")[1])
+		}
+	} else {
+		req.Header.Add(strings.Split(conf.Headers, ":")[0], strings.Split(conf.Headers, ":")[1])
 	}
 
 	tls_config := &tls.Config{InsecureSkipVerify: conf.Insecure}
